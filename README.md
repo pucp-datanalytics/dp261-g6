@@ -5,9 +5,11 @@
 | Nombre | Rol |
 |--------|-----|
 | Pedro Shiguihara | Product Owner (P.O) |
-| _Nombre Apellido_ | _Rol del miembro_ |
-| _Nombre Apellido_ | _Rol del miembro_ |
-| _Nombre Apellido_ | _Rol del miembro_ |
+| Marcelo Sullcaray | Project Manager (P.M) |
+| Davis Chaupis | Data Analyst (D.A)|
+| Leonardo Huanca | Data Engineer (D.E) |
+| Gianfranco Vargas | Prototype Developer (P.D) |
+| Eduardo Arroyo | Business Analyst (B.A)|
 
 ## GitHub Project
 
