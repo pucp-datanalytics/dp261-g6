@@ -153,3 +153,15 @@ Entregables:
 - Documentación de arquitectura y guía de uso
 - Demo funcional del MVP presentada al stakeholder
 
+
+---
+
+## 🛠️ Guía de Inicio Rápido (Setup Técnico)
+
+Para que el equipo pueda trabajar con las mismas versiones, sigan estos pasos en su terminal:
+
+1. **Crear el entorno desde el archivo:**
+   ```powershell
+   conda env create -f environment.yml
+
+---
