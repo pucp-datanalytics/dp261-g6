@@ -1,0 +1,17 @@
+name: environment
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pandas
+  - numpy
+  - matplotlib
+  - seaborn
+  - scikit-learn
+  - statsmodels
+  - scipy
+  - jupyterlab
+  - ipywidgets
+  - dvc
+  - dvc-gdrive
+  - pyarrow
