@@ -1,0 +1,6 @@
+/data/raw/*
+/data/final/*
+/models/*
+!/data/raw/.gitkeep
+!/data/final/.gitkeep
+!/models/.gitkeep
