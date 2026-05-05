@@ -1,6 +1,27 @@
-/data/raw/*
-/data/final/*
-/models/*
-!/data/raw/.gitkeep
-!/data/final/.gitkeep
-!/models/.gitkeep
+# =========================
+# MODELOS (NO subir)
+# =========================
+models/*.pkl
+
+# =========================
+# DATA (manejado por DVC)
+# =========================
+data/final/*.csv
+data/interim/*.csv
+data/raw/*.csv
+
+# =========================
+# JUPYTER
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# PYTHON
+# =========================
+__pycache__/
+*.pyc
+
+# =========================
+# OTROS
+# =========================
+.DS_Store
