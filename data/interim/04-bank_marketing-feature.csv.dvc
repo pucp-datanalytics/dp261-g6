@@ -1,0 +1,5 @@
+outs:
+- md5: 0ec02785b740b02f219671d781bf58d5
+  size: 7266689
+  hash: md5
+  path: 04-bank_marketing-feature.csv
