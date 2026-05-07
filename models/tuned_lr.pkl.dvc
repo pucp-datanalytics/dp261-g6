@@ -1,0 +1,5 @@
+outs:
+- md5: 254a782bfe7ce34a38894664d5d492cd
+  size: 2159
+  hash: md5
+  path: tuned_lr.pkl
