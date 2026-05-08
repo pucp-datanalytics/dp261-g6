@@ -1,0 +1,5 @@
+outs:
+- md5: ac5b26b948c77e0f20067fa2d2e9d506
+  size: 261510921
+  hash: md5
+  path: soft_voting_model.pkl
