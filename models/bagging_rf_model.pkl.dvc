@@ -1,5 +1,5 @@
 outs:
-- md5: e1376323ebfbd527ded0e5c41bca1805
-  size: 862602796
+- md5: 396b5174f4597da30a374c52bfadee20
+  size: 716613743
   hash: md5
   path: bagging_rf_model.pkl

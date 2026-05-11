@@ -4,3 +4,6 @@
 /baseline_rf.pkl
 /baseline_svm.pkl
 /preprocessor.pkl
+/final_model.pkl
+/experiments_log.csv
+/bagging_rf_model.pkl
