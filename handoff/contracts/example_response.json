@@ -1,0 +1,6 @@
+{
+  "prediccion": 1,
+  "probabilidad_suscripcion": 0.32,
+  "umbral_negocio": 0.19,
+  "decision": "Priorizar llamada"
+}

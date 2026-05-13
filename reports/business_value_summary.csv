@@ -1,0 +1,2 @@
+modelo,umbral_optimo,valor_total_test,valor_por_cliente,clientes_mes,impacto_mensual_estimado,impacto_anual_estimado,precision_umbral_optimo,recall_umbral_optimo,f1_umbral_optimo,roc_auc,benefit_tp,cost_fp,cost_fn,benefit_tn
+final_model.pkl,0.05,36550.0,4.4389118290017,100000,443891.18290017004,5326694.19480204,0.11486146095717883,0.9838187702265372,0.20570655238524868,0.7982916442081148,60,-2.5,-40,0
