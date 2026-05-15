@@ -1,0 +1,17 @@
+{
+  "description": "Esquema de salida del modelo",
+  "fields": {
+    "prediccion": {
+      "type": "integer",
+      "description": "0 = no priorizar, 1 = priorizar contacto"
+    },
+    "probabilidad_suscripcion": {
+      "type": "float",
+      "description": "Probabilidad estimada de suscripción"
+    },
+    "decision": {
+      "type": "string",
+      "description": "Recomendación operativa basada en el umbral de negocio"
+    }
+  }
+}

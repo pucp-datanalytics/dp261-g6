@@ -1,0 +1,5 @@
+outs:
+- md5: 806e5897204808f707a3799cfcd905d3
+  size: 10887059
+  hash: md5
+  path: 03-bank_marketing_cleaned.csv
