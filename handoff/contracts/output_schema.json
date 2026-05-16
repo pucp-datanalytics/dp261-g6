@@ -1,17 +1,11 @@
 {
-  "description": "Esquema de salida del modelo",
-  "fields": {
-    "prediccion": {
-      "type": "integer",
-      "description": "0 = no priorizar, 1 = priorizar contacto"
-    },
-    "probabilidad_suscripcion": {
-      "type": "float",
-      "description": "Probabilidad estimada de suscripción"
-    },
-    "decision": {
-      "type": "string",
-      "description": "Recomendación operativa basada en el umbral de negocio"
-    }
-  }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BankMarketingOutputSchema",
+  "type": "object",
+  "properties": {
+    "prediction": {"type": "integer", "enum": [0, 1]},
+    "probability": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+    "recommendation": {"type": "string"}
+  },
+  "required": ["prediction", "probability", "recommendation"]
 }

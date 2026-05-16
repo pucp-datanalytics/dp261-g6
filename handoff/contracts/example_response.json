@@ -1,6 +1,5 @@
 {
-  "prediccion": 1,
-  "probabilidad_suscripcion": 0.32,
-  "umbral_negocio": 0.19,
-  "decision": "Priorizar llamada"
+  "prediction": 0,
+  "probability": 0.145,
+  "recommendation": "No contactar - Baja probabilidad de suscripción"
 }
