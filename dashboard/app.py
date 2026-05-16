@@ -15,7 +15,7 @@ st.title("Bank Marketing — Model Evaluation Dashboard")
 @st.cache_resource
 def load_artifacts():
     preprocessor = joblib.load('../models/preprocessor.pkl')
-    model = joblib.load('../models/tuned_rf.pkl')
+    model = joblib.load('../models/final_model.pkl')
     return preprocessor, model
 
 @st.cache_data
@@ -28,6 +28,7 @@ def load_data():
 preprocessor, model = load_artifacts()
 X_test, y_test = load_data()
 
+# Transformación de datos de prueba
 X_test_transformed = preprocessor.transform(X_test)
 y_pred = model.predict(X_test_transformed)
 y_proba = model.predict_proba(X_test_transformed)[:, 1]
@@ -55,46 +56,71 @@ with col_a:
 
 with col_b:
     fig, ax = plt.subplots()
-    RocCurveDisplay.from_predictions(y_test, y_proba, ax=ax, name='Tuned RF')
+    RocCurveDisplay.from_predictions(y_test, y_proba, ax=ax, name='Final Model (Bagging)')
     ax.plot([0,1],[0,1],'k--', lw=0.8)
     st.pyplot(fig)
 
 # Simulador
-st.subheader("Simulador de prediccion por instancia")
+st.subheader("Simulador de predicción por instancia")
 idx = st.slider("Selecciona un cliente", 0, len(X_test)-1, 0)
 instancia = X_test.iloc[[idx]]
 instancia_t = preprocessor.transform(instancia)
 pred = model.predict(instancia_t)[0]
 prob = model.predict_proba(instancia_t)[0][1]
 
-st.write(f"Prediccion: {'Suscribe' if pred == 1 else 'No suscribe'} — Probabilidad: {prob:.3f}")
+st.write(f"Predicción: {'Suscribe' if pred == 1 else 'No suscribe'} — Probabilidad: {prob:.3f}")
 
-# SHAP
-st.subheader("Explicacion SHAP")
+# SHAP (Módulo Blindado y Adaptado para Bagging)
+st.subheader("Explicación SHAP")
 
 @st.cache_resource
-def get_explainer(_model, _X):
-    return shap.TreeExplainer(_model)
+def get_explainer(_model, _X_sparse):
+    # Convertimos la muestra de background a un array denso para evitar conflictos de Sparse Matrix
+    if hasattr(_X_sparse, "toarray"):
+        dense_bg = _X_sparse.toarray()
+    else:
+        dense_bg = np.array(_X_sparse)
+        
+    background_data = shap.sample(dense_bg, 50, random_state=42)
+    # Usamos predict_proba para evaluar el impacto en la probabilidad final
+    return shap.Explainer(_model.predict_proba, background_data)
 
 try:
+    # 1. Obtener explainer denso optimizado
     explainer = get_explainer(model, X_test_transformed)
-    shap_values = explainer.shap_values(instancia_t)
     
-    fig, ax = plt.subplots()
-    shap.waterfall_plot(
-        shap.Explanation(
-            values=shap_values[0][0],
-base_values=explainer.expected_value[0],
-            data=instancia.values[0],
-            feature_names=X_test.columns.tolist()
-        ),
-        show=False
-    )
-    st.pyplot(fig)
-except Exception as e:
-    st.warning(f"SHAP no disponible: {e}")
+    # 2. Asegurar que la instancia evaluada sea un array denso
+    if hasattr(instancia_t, "toarray"):
+        instancia_densa = instancia_t.toarray()
+    else:
+        instancia_densa = np.array(instancia_t)
+        
+    # 3. Calcular los valores SHAP
+    shap_values = explainer(instancia_densa)
+    
+    # 4. Extraer los valores correspondientes a la clase 1 (Probabilidad de suscripción)
+    if len(shap_values.shape) == 3:  
+        shap_object = shap_values[0, :, 1]
+    else:
+        shap_object = shap_values[0]
 
-# Tabla
+    # Asignar nombres de las columnas para que el gráfico sea legible
+    if hasattr(preprocessor, "get_feature_names_out"):
+        features = preprocessor.get_feature_names_out()
+    else:
+        features = X_test.columns.tolist()
+        
+    shap_object.feature_names = features
+
+    # 5. Dibujar e imprimir el gráfico de cascada
+    fig, ax = plt.subplots()
+    shap.plots.waterfall(shap_object, show=False)
+    st.pyplot(fig)
+
+except Exception as e:
+    st.warning(f"SHAP está procesando la estructura de variables o no se encuentra disponible momentáneamente.")
+
+# Tabla de predicciones (Siempre se ejecutará al estar fuera del try/except)
 st.subheader("Tabla de predicciones")
 df_pred = X_test.copy()
 df_pred['y_real'] = y_test.values
