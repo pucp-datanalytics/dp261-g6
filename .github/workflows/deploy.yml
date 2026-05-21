@@ -5,7 +5,9 @@ on:
     branches: [ "feat/PB-20" ]
 
 jobs:
-  build-and-deploy:
+  # ---- PASO 1: COMPILAR Y SUBIR LA IMAGEN A AMAZON ECR ----
+  build:
+    name: Build and Push to ECR
     runs-on: ubuntu-latest
     
     steps:
@@ -32,3 +34,40 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  # ---- PASO 2: CONECTARSE POR SSH A LA EC2 Y ARRANCAR EL CONTENEDOR ----
+  deploy:
+    name: Deploy to Amazon EC2
+    needs: build  # <--- Esto obliga a que espere a que el Paso 1 termine con éxito
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Executing remote SSH commands to deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        port: 22
+        script: |
+          # 1. Autenticar Docker con Amazon ECR dentro de la EC2 usando el ID de tu cuenta
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 442249350005.dkr.ecr.us-east-1.amazonaws.com
+          
+          # 2. Descargar la última versión de la imagen
+          docker pull 442249350005.dkr.ecr.us-east-1.amazonaws.com/bank-marketing-api:latest
+          
+          # 3. Apagar y remover el contenedor anterior para liberar el puerto 8000
+          docker stop api-marketing-container || true
+          docker rm api-marketing-container || true
+          
+          # 4. Encender el nuevo contenedor mapeando tu carpeta física de modelos de la EC2
+          docker run -d -p 8000:8000 \
+            --name api-marketing-container \
+            -v /home/ubuntu/dp261-g6/models:/app/models \
+            442249350005.dkr.ecr.us-east-1.amazonaws.com/bank-marketing-api:latest
+            
+          # 5. Limpieza de imágenes huérfanas viejas para cuidar tus 6.7 GB de espacio
+          docker image prune -f
