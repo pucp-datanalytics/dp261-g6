@@ -1,0 +1,7 @@
+{
+  "description": "Esquema de entrada para predicción de suscripción bancaria",
+  "input_type": "tabular",
+  "required": "El archivo debe contener las mismas columnas usadas por el modelo final, excepto la variable objetivo y.",
+  "target_column": "y",
+  "notes": "Para Sprint 6, validar columnas exactas desde el dataset procesado y el pipeline final."
+}
