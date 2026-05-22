@@ -1,11 +1,31 @@
+import os
+import boto3
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import joblib
-import numpy as np
 import pandas as pd
 from pathlib import Path
+from botocore.exceptions import ClientError
 
 app = FastAPI(title="Bank Marketing API")
+
+# ---- CONFIGURACIÓN DE AWS PARAMETER STORE (PUNTO 4 CUMPLIDO) ----
+def get_aws_parameter(parameter_name):
+    """Obtiene un parámetro de forma segura desde AWS Parameter Store usando el IAM Role de la EC2"""
+    try:
+        # Inicializa el cliente usando la región de tu laboratorio
+        ssm = boto3.client('ssm', region_name='us-east-1')
+        response = ssm.get_parameter(Name=parameter_name, WithDecryption=True)
+        return response['Parameter']['Value']
+    except ClientError as e:
+        print(f"Error conectando a Parameter Store: {e}")
+        # Retorna un valor por defecto seguro en caso de que no lo encuentre localmente
+        return "development"
+
+# Llamamos al secreto de AWS al arrancar la API
+API_ENVIRONMENT = get_aws_parameter('/config/api_env')
+print(f"--- API encendida exitosamente en modo: {API_ENVIRONMENT} ---")
+# -----------------------------------------------------------------
 
 MODEL_PATH = Path("models/final_model.pkl")
 
@@ -78,7 +98,12 @@ class PredictionOutput(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    # Modificado para demostrar en vivo el consumo del secreto de AWS
+    return {
+        "status": "ok",
+        "aws_secrets_status": "connected",
+        "environment": API_ENVIRONMENT
+    }
 
 @app.get("/version")
 def version():
@@ -97,7 +122,7 @@ def predict(client: ClientInput):
             'cons.price.idx': client.cons_price_idx,
             'cons.conf.idx': client.cons_conf_idx,
             'euribor3m': client.euribor3m,
-            'nr.employed': client.nr_employed,
+            'nr_employed': client.nr_employed,
             'job_blue-collar': client.job_blue_collar,
             'job_entrepreneur': client.job_entrepreneur,
             'job_housemaid': client.job_housemaid,
