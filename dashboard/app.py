@@ -36,14 +36,12 @@ def check_api_health() -> bool:
         return False
 
 def safe_int(val, default=0):
-    """Convierte float 0.0/1.0 a int sin perder valores negativos."""
     try:
         return int(val)
     except Exception:
         return default
 
 def safe_float(val, default=0.0):
-    """Convierte a float de forma segura."""
     try:
         return float(val)
     except Exception:
@@ -108,20 +106,15 @@ def call_predict(row: dict) -> dict:
 def run_predictions(df, n_filas):
     results = []
     errores = 0
-    primer_error = None
     prog = st.progress(0)
     for i, (_, row) in enumerate(df.head(n_filas).iterrows()):
         try:
             res = call_predict(row.to_dict())
             results.append(res)
-        except Exception as e:
+        except Exception:
             errores += 1
-            if primer_error is None:
-                primer_error = str(e)
             results.append({"prediction": 0, "probability": 0.0, "label": "Error"})
         prog.progress((i + 1) / n_filas)
-    if primer_error:
-        st.error(f"🔍 Primer error encontrado: `{primer_error}`")
     return results, errores
 
 def show_metrics_and_charts(y_true, y_pred, y_proba):
@@ -245,15 +238,14 @@ with col_opt2:
     else:
         n_filas = total_filas
         tiempo_est = total_filas // 10
-        st.warning(f"⚠️ Se procesarán **{total_filas} filas** (~{tiempo_est//60} min {tiempo_est%60} seg). Solo recomendado en laptops potentes.")
+        st.warning(f"⚠️ Se procesarán **{total_filas} filas** (~{tiempo_est//60} min {tiempo_est%60} seg).")
 
 st.write(f"Se procesarán: **{n_filas} filas**")
 
 # ──────────────────────────────────────────────
-# PREDICCIONES
+# PREDICCIONES CON SESSION STATE
 # ──────────────────────────────────────────────
 if st.button("🚀 Obtener predicciones"):
-
     if tiene_target:
         X_datos = df_datos.drop(columns='y')
         y_true  = df_datos['y'].head(n_filas).values
@@ -264,6 +256,21 @@ if st.button("🚀 Obtener predicciones"):
     with st.spinner(f"Consultando API para {n_filas} filas..."):
         results, errores = run_predictions(X_datos, n_filas)
 
+    # Guardar en session_state para no perder al mover slider
+    st.session_state['results']  = results
+    st.session_state['errores']  = errores
+    st.session_state['y_true']   = y_true
+    st.session_state['X_datos']  = X_datos.head(n_filas)
+    st.session_state['n_filas']  = n_filas
+
+# Mostrar resultados si ya existen en session_state
+if 'results' in st.session_state:
+    results  = st.session_state['results']
+    errores  = st.session_state['errores']
+    y_true   = st.session_state['y_true']
+    X_datos  = st.session_state['X_datos']
+    n_filas  = st.session_state['n_filas']
+
     if errores > 0:
         st.warning(f"⚠️ {errores} filas tuvieron errores.")
     else:
@@ -273,7 +280,7 @@ if st.button("🚀 Obtener predicciones"):
     y_proba = np.array([r["probability"] for r in results])
 
     # Métricas y gráficos
-    if tiene_target:
+    if y_true is not None:
         st.subheader("Métricas generales")
         show_metrics_and_charts(y_true, y_pred, y_proba)
     else:
@@ -281,17 +288,17 @@ if st.button("🚀 Obtener predicciones"):
 
     # Tabla
     st.subheader("Tabla de predicciones")
-    df_result = X_datos.head(n_filas).copy()
-    if tiene_target:
+    df_result = X_datos.copy()
+    if y_true is not None:
         df_result['y_real'] = y_true
     df_result['y_pred']       = y_pred
     df_result['probabilidad'] = y_proba
     df_result['label']        = [r["label"] for r in results]
     st.dataframe(df_result)
 
-    # Simulador
+    # Simulador — ahora NO recarga las predicciones
     st.subheader("Simulador de predicción por instancia")
-    idx = st.slider("Selecciona un cliente", 0, n_filas - 1, 0)
+    idx = st.slider("Selecciona un cliente", 0, n_filas - 1, 0, key="slider_instancia")
     st.write(f"**Predicción:** {df_result['label'].iloc[idx]} — **Probabilidad:** {df_result['probabilidad'].iloc[idx]:.3f}")
 
     # Descarga
