@@ -112,6 +112,7 @@ def version():
 @app.post("/predict", response_model=PredictionOutput)
 def predict(client: ClientInput):
     try:
+        # Construimos el diccionario mapeando los nombres exactos que exige el modelo (con puntos y guiones correspondientes)
         data = pd.DataFrame([{
             'age': client.age,
             'education': client.education,
@@ -122,7 +123,7 @@ def predict(client: ClientInput):
             'cons.price.idx': client.cons_price_idx,
             'cons.conf.idx': client.cons_conf_idx,
             'euribor3m': client.euribor3m,
-            'nr_employed': client.nr_employed,
+            'nr.employed': client.nr_employed,        # CORREGIDO: Cambiado de 'nr_employed' a 'nr.employed'
             'job_blue-collar': client.job_blue_collar,
             'job_entrepreneur': client.job_entrepreneur,
             'job_housemaid': client.job_housemaid,
@@ -158,6 +159,9 @@ def predict(client: ClientInput):
             'campaign_intensity': client.campaign_intensity,
             'has_loan_or_housing': client.has_loan_or_housing,
         }])
+
+        # PASO SALVAVIDAS: Forzar el orden y estructura exacta de las columnas de entrenamiento
+        data = data[FEATURES]
 
         pred = int(model.predict(data)[0])
         prob = float(model.predict_proba(data)[0][1])
