@@ -7,3 +7,5 @@
 /final_model.pkl
 /experiments_log.csv
 /bagging_rf_model.pkl
+/soft_voting_model.pkl
+/tuned_rf.pkl
