@@ -1,2 +1,3 @@
-modelo,umbral_optimo,valor_total_test,valor_por_cliente,clientes_mes,impacto_mensual_estimado,impacto_anual_estimado,precision_umbral_optimo,recall_umbral_optimo,f1_umbral_optimo,roc_auc,benefit_tp,cost_fp,cost_fn,benefit_tn
-final_model.pkl,0.05,36550.0,4.4389118290017,100000,443891.18290017004,5326694.19480204,0.11486146095717883,0.9838187702265372,0.20570655238524868,0.7982916442081148,60,-2.5,-40,0
+modelo,umbral,criterio,precision,recall,f1,valor_total_test,valor_por_cliente,impacto_mensual_estimado,impacto_anual_estimado,roc_auc
+final_model.pkl,0.050,Máximo valor económico puro,0.1151,0.986,0.2061,36745.0,4.4626,446259.0,5355113.0,0.7982
+final_model.pkl,0.204,"Operativo (recall >= 0.75, precision viable)",0.2303,0.7584,0.3577,27345.0,3.2609,326087.0,3913043.0,0.7982
