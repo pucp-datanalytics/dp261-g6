@@ -7,6 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY api/main.py .
 COPY models/final_model.pkl models/final_model.pkl
+COPY models/bagging_rf_threshold.pkl models/bagging_rf_threshold.pkl
 
 RUN useradd -m appuser
 USER appuser

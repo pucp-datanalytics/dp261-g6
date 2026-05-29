@@ -8,8 +8,10 @@ from pathlib import Path
 app = FastAPI(title="Bank Marketing API")
 
 MODEL_PATH = Path("models/final_model.pkl")
+THRESHOLD_PATH = Path("models/bagging_rf_threshold.pkl")
 
 model = joblib.load(MODEL_PATH)
+threshold = joblib.load(THRESHOLD_PATH)
 
 FEATURES = [
     'age', 'education', 'campaign', 'pdays', 'previous', 'emp.var.rate',
@@ -134,8 +136,8 @@ def predict(client: ClientInput):
             'has_loan_or_housing': client.has_loan_or_housing,
         }])
 
-        pred = int(model.predict(data)[0])
         prob = float(model.predict_proba(data)[0][1])
+        pred = int(prob >= threshold)
         label = "Suscribe" if pred == 1 else "No suscribe"
 
         return PredictionOutput(prediction=pred, probability=prob, label=label)
