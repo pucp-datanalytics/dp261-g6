@@ -2,7 +2,7 @@ name: Deploy Bank Marketing API to AWS
 
 on:
   push:
-    branches: [ "feat/PB-20" ]
+    branches: [ "feat/PB-22" ]
 
 jobs:
   # ---- PASO 1: COMPILAR Y SUBIR LA IMAGEN A AMAZON ECR ----
